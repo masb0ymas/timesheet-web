@@ -16,8 +16,7 @@ export default function Document() {
           rel="stylesheet"
         />
       </Head>
-
-      <body className="antialiased bg-slate-100">
+      <body className="antialiased">
         <Main />
         <NextScript />
       </body>
