@@ -1,24 +1,30 @@
-import prisma from "~/lib/prisma"
+import _ from "lodash"
 import { NextApiRequest, NextApiResponse } from "next"
+import { getServerSession } from "next-auth"
+import prisma from "~/lib/prisma"
+import { authOptions } from "../auth/[...nextauth]"
 
-// POST /api/post
-// Required fields in body: title
-// Optional fields in body: content
+/**
+ *
+ * @param req
+ * @param res
+ */
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { name, description } = req.body
+  const { name, description, owner_id } = req.body
 
-  // const session = await getServerSession(req, res, options)
-  // if (session) {
-  // @ts-expect-error
-  const result = await prisma.post.create({
-    data: {
-      name: name,
-      description: description,
-      // author: { connect: { email: session?.user?.email } },
-    },
-  })
-  res.json(result)
-  // } else {
-  //   res.status(401).send({ message: "Unauthorized" })
-  // }
+  const session = await getServerSession(req, res, authOptions)
+  const newOwnerId = _.get(session, "user.id", owner_id)
+
+  if (session) {
+    const result = await prisma.project.create({
+      data: {
+        name: name,
+        description: description,
+        owner_id: newOwnerId,
+      },
+    })
+    res.json(result)
+  } else {
+    res.status(401).send({ message: "Unauthorized" })
+  }
 }

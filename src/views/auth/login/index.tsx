@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { z } from "zod"
 import { Button } from "~/components/ui/button"
+import customErrors from "~/components/ui/form/error"
 import { Input, Label } from "~/components/ui/input"
 import { loginSchema } from "~/schema/auth"
 
@@ -21,7 +22,7 @@ export default function LoginPage() {
       try {
         loginSchema.parse(values)
       } catch (error: any) {
-        console.log(error)
+        console.log(error.formErrors.fieldErrors)
         return error.formErrors.fieldErrors
       }
     },
@@ -66,9 +67,9 @@ export default function LoginPage() {
                 onChange={formik.handleChange}
                 value={formik.values.email}
               />
-              {formik.touched.email || formik.errors.email ? (
-                <div className="text-red-500">{formik.errors.email}</div>
-              ) : null}
+              {formik.touched.email || formik.errors.email
+                ? customErrors(formik.errors, "email")
+                : null}
             </div>
           </div>
 
@@ -90,9 +91,9 @@ export default function LoginPage() {
                 onChange={formik.handleChange}
                 value={formik.values.password}
               />
-              {formik.touched.password || formik.errors.password ? (
-                <div className="text-red-500">{formik.errors.password}</div>
-              ) : null}
+              {formik.touched.password || formik.errors.password
+                ? customErrors(formik.errors, "password")
+                : null}
             </div>
           </div>
 
@@ -102,7 +103,7 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          {errMessage && <p className="text-red-500">{errMessage}</p>}
+          {errMessage && <span className="text-red-500 text-sm mt-1">{errMessage}</span>}
         </form>
       </div>
     </main>
