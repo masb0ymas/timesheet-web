@@ -10,10 +10,11 @@ interface Credentials {
   password: string
 }
 
-const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options)
+const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, authOptions)
 export default authHandler
 
-export const options: NextAuthOptions = {
+
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
@@ -50,9 +51,27 @@ export const options: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    jwt({ token, account, user }) {
+      if (account) {
+        token.accessToken = account.access_token
+        token.id = user?.id
+      }
+      return token
+    },
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user = {
+          ...session.user,
+          id: token.id,
+        }
+      }
+      return session
+    },
+  },
   pages: {
     signIn: "/auth/login",
   },
   adapter: PrismaAdapter(prisma),
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
 }

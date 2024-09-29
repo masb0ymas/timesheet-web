@@ -30,7 +30,7 @@ export default function PrivateContainer(props: IProps) {
   const [isStateLayoutLoading] = stateLayoutLoading
 
   const pathname = usePathname()
-  const { data: session, status  } = useSession()
+  const { data: session, status } = useSession()
 
   console.log(session)
 
@@ -40,7 +40,7 @@ export default function PrivateContainer(props: IProps) {
     }
 
     return
-  }, [session,status])
+  }, [session, status])
 
   let title = "Dashboard"
   let prevPath = "/"
@@ -58,22 +58,26 @@ export default function PrivateContainer(props: IProps) {
     title = capitalizeFirstLetter(firstPath)
   }
 
-  function renderButton() {
-    if (pathname !== "/" && !isActionPath) {
-      return (
-        <Link href={`${pathname}/add`}>
-          <Button>
-            <IconPlus size={18} stroke={2} />
-            <span className="pl-2">Add</span>
-          </Button>
-        </Link>
-      )
-    }
+  const excludePath = ["/", "/dashboard"]
 
-    if (pathname !== "/") {
+  function renderButton() {
+    // exclude path
+    if (!excludePath.includes(pathname)) {
+      // if not action path
+      if (!isActionPath) {
+        return (
+          <Link href={`${pathname}/add`}>
+            <Button>
+              <IconPlus size={18} stroke={2} />
+              <span className="pl-2">Add</span>
+            </Button>
+          </Link>
+        )
+      }
+
       return (
         <Link href={prevPath}>
-          <Button>
+          <Button variant="outline">
             <IconArrowLeft size={18} stroke={2} />
             <span className="pl-2">Back</span>
           </Button>
