@@ -1,3 +1,3 @@
 export default function HomePage() {
-  return <section>Test</section>
+  return <section>Home Page</section>
 }

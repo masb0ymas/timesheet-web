@@ -1,4 +1,5 @@
-import homeRoutes from "./public/home"
+import privateRoutes from "./private"
+import publicRoutes from "./public"
 
 // @ts-expect-error
-export const globalRoutes = [].concat(homeRoutes)
+export const globalRoutes = [].concat(publicRoutes, privateRoutes)

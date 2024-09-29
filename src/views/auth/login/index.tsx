@@ -29,7 +29,8 @@ export default function LoginPage() {
       const res = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard",
       })
 
       if (!_.isNil(res?.error) && !_.isEmpty(res?.error) && res.status !== 200) {

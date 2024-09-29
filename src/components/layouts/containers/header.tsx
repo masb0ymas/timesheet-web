@@ -8,9 +8,11 @@ import {
   MenuItems,
 } from "@headlessui/react"
 import { IconBell, IconBurger, IconX } from "@tabler/icons-react"
-import { signIn, useSession } from "next-auth/react"
+import _ from "lodash"
+import { signIn, signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import { activePath } from "~/lib/matchPath"
 import { Button } from "../../ui/button"
 
@@ -22,15 +24,14 @@ const user = {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/" },
+  { name: "Dashboard", href: "/dashboard" },
   { name: "Project", href: "/project" },
   { name: "Team", href: "/team" },
 ]
 
 const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Your Profile", href: "/profile" },
+  { name: "Settings", href: "/settings" },
 ]
 
 function classNames(...classes: string[]) {
@@ -40,6 +41,16 @@ function classNames(...classes: string[]) {
 export default function Header() {
   const pathname = usePathname()
   const { data: session } = useSession()
+
+  const [originURL, setOriginURL] = useState("http://localhost:3000")
+
+  const email = _.get(session, "user.email", "-")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOriginURL(window.location.origin)
+    }
+  }, [originURL])
 
   return (
     <>
@@ -67,10 +78,15 @@ export default function Header() {
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => {
                       const isActive = activePath(pathname, item.href)
+                      let baseURl = `/auth/login?callbackUrl=${originURL}`
+
+                      if (session) {
+                        baseURl = item.href
+                      }
 
                       return (
                         <Link
-                          href={item.href}
+                          href={baseURl}
                           key={item.name}
                           aria-current={isActive ? "page" : undefined}
                           className={classNames(
@@ -112,16 +128,36 @@ export default function Header() {
                         transition
                         className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                       >
+                        <MenuItem>
+                          <Link
+                            href={"/profile"}
+                            className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 font-semibold"
+                          >
+                            {email.substring(0, 15)}...
+                          </Link>
+                        </MenuItem>
+
+                        <hr className="my-0 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10" />
+
                         {userNavigation.map((item) => (
                           <MenuItem key={item.name}>
-                            <a
+                            <Link
                               href={item.href}
                               className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
                             >
                               {item.name}
-                            </a>
+                            </Link>
                           </MenuItem>
                         ))}
+
+                        <MenuItem>
+                          <button
+                            onClick={() => signOut({ callbackUrl: originURL })}
+                            className="flex justify-start px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 w-full"
+                          >
+                            Sign out
+                          </button>
+                        </MenuItem>
                       </MenuItems>
                     </Menu>
                   </div>

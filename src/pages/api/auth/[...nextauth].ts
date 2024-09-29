@@ -30,6 +30,7 @@ export const options: NextAuthOptions = {
           select: {
             id: true,
             email: true,
+            fullname: true,
             password: true,
           },
         })
@@ -45,7 +46,7 @@ export const options: NextAuthOptions = {
           throw new Error("Invalid credentials, email or password is incorrect")
         }
 
-        return { id: getUser.id, email: getUser.email }
+        return { id: getUser.id, fullname: getUser.fullname, email: getUser.email }
       },
     }),
   ],
