@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import Button from "~/components/ui/button"
+import { Button } from "~/components/ui/button"
 import { Input, Label, Textarea } from "~/components/ui/input"
 import { projectSchema } from "~/schema/project"
 
@@ -18,14 +18,18 @@ function AbstractForm({ initialValues }: AbstractFormProps) {
     defaultValues: initialValues,
   })
 
-  function onSubmit(values: z.infer<typeof projectSchema>) {
+  async function onSubmit(values: z.infer<typeof projectSchema>) {
     setVisible(true)
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
 
     try {
-      //
+      await fetch(`/api/project`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
     } catch (error) {
       console.log(error)
     } finally {
@@ -52,7 +56,9 @@ function AbstractForm({ initialValues }: AbstractFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={visible}>Submit</Button>
+      <Button type="submit" disabled={visible}>
+        Submit
+      </Button>
     </form>
   )
 }

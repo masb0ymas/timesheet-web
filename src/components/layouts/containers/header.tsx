@@ -8,9 +8,11 @@ import {
   MenuItems,
 } from "@headlessui/react"
 import { IconBell, IconBurger, IconX } from "@tabler/icons-react"
+import { signIn, useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { matchPath } from "~/lib/matchPath"
+import { activePath } from "~/lib/matchPath"
+import { Button } from "../../ui/button"
 
 const user = {
   name: "Tom Cook",
@@ -37,6 +39,7 @@ function classNames(...classes: string[]) {
 
 export default function Header() {
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   return (
     <>
@@ -48,7 +51,7 @@ export default function Header() {
         <body class="h-full">
         ```
       */}
-      <div className="min-h-full">
+      <div className="min-h-full top-0 sticky">
         <Disclosure as="nav" className="bg-gray-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
@@ -63,7 +66,7 @@ export default function Header() {
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => {
-                      const isActive = matchPath(pathname, item.href)
+                      const isActive = activePath(pathname, item.href)
 
                       return (
                         <Link
@@ -85,42 +88,48 @@ export default function Header() {
                 </div>
               </div>
               <div className="hidden md:block">
-                <div className="ml-4 flex items-center md:ml-6">
-                  <button
-                    type="button"
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
-                    <IconBell aria-hidden="true" className="h-6 w-6" />
-                  </button>
-
-                  {/* Profile dropdown */}
-                  <Menu as="div" className="relative ml-3">
-                    <div>
-                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                        <span className="absolute -inset-1.5" />
-                        <span className="sr-only">Open user menu</span>
-                        <img alt="" src={user.imageUrl} className="h-8 w-8 rounded-full" />
-                      </MenuButton>
-                    </div>
-                    <MenuItems
-                      transition
-                      className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                {session ? (
+                  <div className="ml-4 flex items-center md:ml-6">
+                    <button
+                      type="button"
+                      className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                     >
-                      {userNavigation.map((item) => (
-                        <MenuItem key={item.name}>
-                          <a
-                            href={item.href}
-                            className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
-                          >
-                            {item.name}
-                          </a>
-                        </MenuItem>
-                      ))}
-                    </MenuItems>
-                  </Menu>
-                </div>
+                      <span className="absolute -inset-1.5" />
+                      <span className="sr-only">View notifications</span>
+                      <IconBell aria-hidden="true" className="h-6 w-6" />
+                    </button>
+
+                    {/* Profile dropdown */}
+                    <Menu as="div" className="relative ml-3">
+                      <div>
+                        <MenuButton className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          <span className="absolute -inset-1.5" />
+                          <span className="sr-only">Open user menu</span>
+                          <img alt="" src={user.imageUrl} className="h-8 w-8 rounded-full" />
+                        </MenuButton>
+                      </div>
+                      <MenuItems
+                        transition
+                        className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                      >
+                        {userNavigation.map((item) => (
+                          <MenuItem key={item.name}>
+                            <a
+                              href={item.href}
+                              className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
+                            >
+                              {item.name}
+                            </a>
+                          </MenuItem>
+                        ))}
+                      </MenuItems>
+                    </Menu>
+                  </div>
+                ) : (
+                  <Button onClick={() => signIn()} fullWidth>
+                    Login
+                  </Button>
+                )}
               </div>
               <div className="-mr-2 flex md:hidden">
                 {/* Mobile menu button */}
@@ -140,7 +149,7 @@ export default function Header() {
           <DisclosurePanel className="md:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
               {navigation.map((item) => {
-                const isActive = matchPath(pathname, item.href)
+                const isActive = activePath(pathname, item.href)
 
                 return (
                   <Link href={item.href} key={item.name}>

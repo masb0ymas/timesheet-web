@@ -1,12 +1,11 @@
-import "~/styles/globals.css";
+import "~/styles/globals.css"
 
-import type { AppProps } from "next/app";
-import Layout from "~/components/layouts";
+import { SessionProvider } from "next-auth/react"
+import type { AppProps } from "next/app"
+import getSiteLayout from "~/components/layouts/core"
 
-export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
-  );
+export default function App({ Component, pageProps, router }: AppProps) {
+  const siteLayout = getSiteLayout({ Component, pageProps, router })
+
+  return <SessionProvider session={pageProps.session}>{siteLayout}</SessionProvider>
 }
