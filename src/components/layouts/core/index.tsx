@@ -1,12 +1,33 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AppProps } from "next/app"
 import React from "react"
-import { globalRoutes } from "../routes"
 import { matchPath } from "~/lib/matchPath"
+import { globalRoutes } from "../routes"
 
 interface IProps {
   exact: boolean
   path: string
   layout: React.Component
+}
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10000,
+    },
+  },
+})
+
+function WrapperReactQuery(props: any) {
+  const { children } = props
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen position="right" />
+    </QueryClientProvider>
+  )
 }
 
 export const DefaultLayoutContext = React.createContext<IProps & any>({
@@ -30,11 +51,13 @@ export default function getSiteLayout(props: AppProps) {
     if (match) {
       return (
         <DefaultLayoutContext.Provider value={curRoute}>
-          {PageLayout ? (
-            <PageLayout {...props} layoutProps={layoutProps} />
-          ) : (
-            <Component {...pageProps} key={router.route} />
-          )}
+          <WrapperReactQuery>
+            {PageLayout ? (
+              <PageLayout {...props} layoutProps={layoutProps} />
+            ) : (
+              <Component {...pageProps} key={router.route} />
+            )}
+          </WrapperReactQuery>
         </DefaultLayoutContext.Provider>
       )
     }
@@ -42,7 +65,9 @@ export default function getSiteLayout(props: AppProps) {
 
   return (
     <DefaultLayoutContext.Provider value={pageProps}>
-      {<Component {...pageProps} key={router.route} />}
+      <WrapperReactQuery>
+        <Component {...pageProps} key={router.route} />
+      </WrapperReactQuery>
     </DefaultLayoutContext.Provider>
   )
 }

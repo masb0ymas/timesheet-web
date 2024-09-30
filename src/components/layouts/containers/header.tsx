@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Disclosure,
   DisclosureButton,
@@ -13,8 +15,8 @@ import { signIn, signOut, useSession } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Button } from "~/components/ui/button"
 import { activePath } from "~/lib/matchPath"
-import { Button } from "../../ui/button"
 
 const user = {
   name: "Tom Cook",
@@ -77,16 +79,20 @@ export default function Header() {
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => {
-                      const isActive = activePath(pathname, item.href)
-                      let baseURl = `/auth/login?callbackUrl=${originURL}`
+                      let isActive = false
+                      let link = `/auth/login?callbackUrl=${originURL}`
+
+                      if (typeof window !== "undefined" && !_.isNil(pathname)) {
+                        isActive = activePath(pathname, item.href)
+                      }
 
                       if (session) {
-                        baseURl = item.href
+                        link = item.href
                       }
 
                       return (
                         <Link
-                          href={baseURl}
+                          href={link}
                           key={item.name}
                           aria-current={isActive ? "page" : undefined}
                           className={classNames(
@@ -185,10 +191,19 @@ export default function Header() {
           <DisclosurePanel className="md:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
               {navigation.map((item) => {
-                const isActive = activePath(pathname, item.href)
+                let isActive = false
+                let link = `/auth/login?callbackUrl=${originURL}`
+
+                if (typeof window !== "undefined" && !_.isNil(pathname)) {
+                  isActive = activePath(pathname, item.href)
+                }
+
+                if (session) {
+                  link = item.href
+                }
 
                 return (
-                  <Link href={item.href} key={item.name}>
+                  <Link href={link} key={item.name}>
                     <DisclosureButton
                       as="a"
                       aria-current={isActive ? "page" : undefined}

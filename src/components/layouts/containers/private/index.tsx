@@ -32,8 +32,6 @@ export default function PrivateContainer(props: IProps) {
   const pathname = usePathname()
   const { data: session, status } = useSession()
 
-  console.log(session)
-
   useEffect(() => {
     if (_.isEmpty(session) && status != "loading") {
       Router.push("/")
@@ -46,16 +44,20 @@ export default function PrivateContainer(props: IProps) {
   let prevPath = "/"
   let isActionPath = false
 
-  if (pathname !== "/") {
-    const paths = pathname.split("/")
-    const firstPath = _.compact(paths)[0]
-    prevPath = `/${firstPath}`
+  if (typeof window !== "undefined") {
+    // especially for client side
+    if (!_.isNil(pathname) && pathname !== "/") {
+      console.log(pathname)
+      const paths = pathname.split("/")
+      const firstPath = _.compact(paths)[0]
+      prevPath = `/${firstPath}`
 
-    if (pathname.match(/\/add|edit$/)) {
-      isActionPath = true
+      if (pathname.match(/\/add|edit$/)) {
+        isActionPath = true
+      }
+
+      title = capitalizeFirstLetter(firstPath)
     }
-
-    title = capitalizeFirstLetter(firstPath)
   }
 
   const excludePath = ["/", "/dashboard"]
