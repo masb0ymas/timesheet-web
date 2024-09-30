@@ -27,6 +27,7 @@ const user = {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard" },
+  { name: "Worklog", href: "/worklog" },
   { name: "Project", href: "/project" },
   { name: "Team", href: "/team" },
 ]

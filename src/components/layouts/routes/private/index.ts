@@ -15,7 +15,10 @@ const routes = [
   {
     path: "/team",
     layout: PrivateContainer,
-    exact: true,
+  },
+  {
+    path: "/worklog",
+    layout: PrivateContainer,
   },
 ]
 
