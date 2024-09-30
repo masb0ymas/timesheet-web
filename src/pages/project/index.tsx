@@ -1,3 +1,3 @@
-export default function ProjectPage() {
-  return <div>ProjectPage</div>
-}
+import ProjectPage from "~/views/project"
+
+export default ProjectPage

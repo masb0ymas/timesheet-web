@@ -1,17 +1,23 @@
+"use client"
+
+import { useMutation } from "@tanstack/react-query"
 import { useFormik } from "formik"
 import _ from "lodash"
 import { useSession } from "next-auth/react"
-import Router from "next/router"
+import Router, { useRouter } from "next/router"
 import { useState } from "react"
 import { z } from "zod"
+import { queryClient } from "~/components/layouts/core"
 import { Button } from "~/components/ui/button"
 import customErrors from "~/components/ui/form/error"
 import { Input, Label, Textarea } from "~/components/ui/input"
-import { projectSchema } from "~/schema/project"
+import useProjectById from "~/data/query/project/useProjectById"
+import { projectSchema } from "~/data/schema/project"
 
 interface AbstractFormProps {
   initialValues: any
-  mutationFunc: (values: z.infer<typeof projectSchema>) => Promise<Response>
+  mutation: ReturnType<typeof useMutation<any, any, any, any>>
+  isEdit?: boolean
 }
 
 /**
@@ -19,7 +25,8 @@ interface AbstractFormProps {
  * @param {AbstractFormProps} props
  * @returns
  */
-function AbstractForm({ initialValues, mutationFunc }: AbstractFormProps) {
+function AbstractForm(props: AbstractFormProps) {
+  const { initialValues, mutation, isEdit = false } = props
   const [errMessage, setErrMessage] = useState("")
   const baseURL = `/project`
 
@@ -35,7 +42,8 @@ function AbstractForm({ initialValues, mutationFunc }: AbstractFormProps) {
     },
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await mutationFunc(values)
+        const res = await mutation.mutateAsync(values)
+        console.log(res)
 
         Router.push(baseURL)
       } catch (error: any) {
@@ -82,7 +90,7 @@ function AbstractForm({ initialValues, mutationFunc }: AbstractFormProps) {
       </div>
 
       <Button type="submit" disabled={formik.isSubmitting}>
-        Submit
+        {isEdit ? "Update" : "Submit"}
       </Button>
 
       {errMessage && <span className="text-red-500 text-sm mt-1">{errMessage}</span>}
@@ -99,13 +107,51 @@ export function FormAdd() {
     owner_id: session?.user?.id,
   }
 
-  const mutation = async (values: z.infer<typeof projectSchema>) => {
-    return await fetch("/api/project", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    })
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof projectSchema>) => {
+      return await fetch("/api/project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["project", "project-by-id"] })
+    },
+  })
+
+  return <AbstractForm initialValues={initialValues} mutation={mutation} />
+}
+
+export function FormEdit() {
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  const id = _.get(router, "query.id", "") as string
+  const isEdit = Boolean(id)
+
+  const { data } = useProjectById(id)
+
+  const initialValues: z.infer<typeof projectSchema> = {
+    name: String(data?.name),
+    description: String(data?.description),
+    owner_id: session?.user?.id,
   }
 
-  return <AbstractForm initialValues={initialValues} mutationFunc={mutation} />
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof projectSchema>) => {
+      return await fetch(`/api/project/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["project", "project-by-id"] })
+    },
+  })
+
+  return <AbstractForm initialValues={initialValues} mutation={mutation} isEdit={isEdit} />
 }

@@ -4,11 +4,6 @@ import { getServerSession } from "next-auth"
 import prisma from "~/lib/prisma"
 import { authOptions } from "../auth/[...nextauth]"
 
-/**
- *
- * @param req
- * @param res
- */
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { name, description, owner_id } = req.body
 
@@ -19,28 +14,44 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.status(401).send({ message: "Unauthorized" })
   }
 
-  if (!["GET", "POST"].includes(String(req.method).toUpperCase())) {
+  if (!["GET", "PUT", "DELETE"].includes(String(req.method).toUpperCase())) {
     res.status(405).send({ message: "Method not allowed" })
   }
 
-  // find all project
+  // find by id project
   if (req.method === "GET") {
-    const result = await prisma.project.findMany({
-      take: 10,
+    const result = await prisma.project.findFirst({
+      where: { id: String(req.query.id) },
     })
-    const total = await prisma.project.count()
 
-    res.json({ data: result, total })
+    if (!result) {
+      res.status(404).send({ message: "Project not found" })
+    }
+
+    res.json({ data: result })
   }
 
-  // create project
-  if (req.method === "POST") {
-    const result = await prisma.project.create({
+  // update project
+  if (req.method === "PUT") {
+    console.log("PUT", req.query.id)
+
+    const result = await prisma.project.update({
+      where: { id: String(req.query.id) },
       data: {
         name: name,
         description: description,
         owner_id: newOwnerId,
       },
+    })
+    res.json(result)
+  }
+
+  // delete project
+  if (req.method === "DELETE") {
+    console.log("DELETE", req.query.id)
+
+    const result = await prisma.project.delete({
+      where: { id: String(req.query.id) },
     })
     res.json(result)
   }
