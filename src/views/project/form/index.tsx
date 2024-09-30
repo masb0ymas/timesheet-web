@@ -89,7 +89,7 @@ function AbstractForm(props: AbstractFormProps) {
         </div>
       </div>
 
-      <Button type="submit" disabled={formik.isSubmitting}>
+      <Button type="submit" disabled={formik.isSubmitting} loading={formik.isSubmitting}>
         {isEdit ? "Update" : "Submit"}
       </Button>
 
@@ -131,7 +131,7 @@ export function FormEdit() {
   const id = _.get(router, "query.id", "") as string
   const isEdit = Boolean(id)
 
-  const { data } = useProjectById(id)
+  const { data, isLoading } = useProjectById(id)
 
   const initialValues: z.infer<typeof projectSchema> = {
     name: String(data?.name),
@@ -152,6 +152,10 @@ export function FormEdit() {
       queryClient.invalidateQueries({ queryKey: ["project", "project-by-id"] })
     },
   })
+
+  if (isLoading) {
+    return <span>Loading...</span>
+  }
 
   return <AbstractForm initialValues={initialValues} mutation={mutation} isEdit={isEdit} />
 }

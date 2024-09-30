@@ -1,5 +1,6 @@
 "use client"
 
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 import { QueryObserverBaseResult, useMutation } from "@tanstack/react-query"
 import {
   ColumnDef,
@@ -8,11 +9,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import _ from "lodash"
+import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import { Button } from "../button"
-import { IconEdit, IconTrash } from "@tabler/icons-react"
-import { useRouter } from "next/router"
-import _ from "lodash"
 
 type Query = QueryObserverBaseResult & {
   data: any[]
@@ -36,15 +36,20 @@ export default function Table<T>(props: IProps<T>) {
 
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
+  const [visible, setVisible] = useState(false)
 
   const { data, isLoading, isFetching } = query
 
   async function handleDelete(id: string) {
+    setVisible(true)
+
     try {
       await mutation?.mutateAsync(id)
     } catch (error) {
       console.log(error)
     }
+
+    setVisible(false)
   }
 
   const defaultColumns: ColumnDef<T, any>[] = [
@@ -66,8 +71,13 @@ export default function Table<T>(props: IProps<T>) {
             )}
 
             {isDelete && (
-              <Button variant="ghost" onClick={() => handleDelete(id)}>
-                <IconTrash />
+              <Button
+                variant={visible ? "default" : "ghost"}
+                onClick={() => handleDelete(id)}
+                disabled={visible}
+                loading={visible}
+              >
+                {!visible && <IconTrash />}
               </Button>
             )}
           </div>

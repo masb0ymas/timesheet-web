@@ -98,7 +98,12 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <Button fullWidth type="submit" disabled={formik.isSubmitting}>
+            <Button
+              fullWidth
+              type="submit"
+              disabled={formik.isSubmitting}
+              loading={formik.isSubmitting}
+            >
               Login
             </Button>
           </div>
