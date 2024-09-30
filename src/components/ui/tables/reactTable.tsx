@@ -13,6 +13,7 @@ import _ from "lodash"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
 import { Button } from "../button"
+import Loader from "../loader"
 
 type Query = QueryObserverBaseResult & {
   data: any[]
@@ -38,13 +39,16 @@ export default function Table<T>(props: IProps<T>) {
   const [pageSize, setPageSize] = useState<number>(10)
   const [visible, setVisible] = useState(false)
 
-  const { data, isLoading, isFetching } = query
+  const { data, isLoading, isFetching, refetch } = query
 
   async function handleDelete(id: string) {
     setVisible(true)
 
     try {
       await mutation?.mutateAsync(id)
+
+      // refetch data
+      refetch()
     } catch (error) {
       console.log(error)
     }
@@ -75,9 +79,8 @@ export default function Table<T>(props: IProps<T>) {
                 variant={visible ? "default" : "ghost"}
                 onClick={() => handleDelete(id)}
                 disabled={visible}
-                loading={visible}
               >
-                {!visible && <IconTrash />}
+                {visible ? <Loader /> : <IconTrash />}
               </Button>
             )}
           </div>
