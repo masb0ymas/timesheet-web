@@ -12,8 +12,8 @@ import {
 import _ from "lodash"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
+import Loader from "~/components/svg/loader"
 import { Button } from "../button"
-import Loader from "../loader"
 
 type Query = QueryObserverBaseResult & {
   data: any[]
@@ -80,7 +80,7 @@ export default function Table<T>(props: IProps<T>) {
                 onClick={() => handleDelete(id)}
                 disabled={visible}
               >
-                {visible ? <Loader /> : <IconTrash />}
+                {visible ? <Loader styleProps="-ml-1 -mr-1" /> : <IconTrash />}
               </Button>
             )}
           </div>

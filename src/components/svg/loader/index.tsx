@@ -1,9 +1,14 @@
+import clsx from "clsx"
 import React from "react"
 
-export default function Loader() {
+interface IProps {
+  styleProps?: string
+}
+
+export default function Loader(props: IProps) {
   return (
     <svg
-      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+      className={clsx("animate-spin -ml-1 mr-3 h-5 w-5 text-white", props.styleProps)}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
