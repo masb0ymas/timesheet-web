@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bun run prisma:generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "bunx prisma generate",
+    "postinstall": "bun run prisma:generate",
     "prisma:generate": "bunx prisma generate",
     "prisma:studio": "bunx prisma studio",
     "db:migrate": "bunx prisma db push",
