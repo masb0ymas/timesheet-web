@@ -6,7 +6,7 @@ import { z } from "zod"
 import { Button } from "~/components/ui/button"
 import customErrors from "~/components/ui/form/error"
 import { Input, Label } from "~/components/ui/input"
-import { loginSchema } from "~/schema/auth"
+import { loginSchema } from "~/data/schema/auth"
 
 export default function LoginPage() {
   const [errMessage, setErrMessage] = useState("")
