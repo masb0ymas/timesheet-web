@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation } from "@tanstack/react-query"
+import { formatDate } from "date-fns"
 import { useFormik } from "formik"
 import _ from "lodash"
 import { useSession } from "next-auth/react"
@@ -117,6 +118,7 @@ function AbstractForm(props: AbstractFormProps) {
             placeholder="4h"
             type="date"
             id="worked_at"
+            max={formatDate(new Date(), "yyyy-MM-dd")}
             onChange={formik.handleChange}
             value={formik.values.worked_at}
           />
@@ -229,7 +231,7 @@ export function FormEdit() {
     user_id: session?.user?.id,
     project_id: String(data?.project_id),
     remaining_time: String(data?.remaining_time),
-    worked_at: new Date(String(data?.worked_at)),
+    worked_at: data?.worked_at && formatDate(new Date(String(data?.worked_at)), "yyyy-MM-dd"),
     duration: String(data?.duration),
     description: String(data?.description),
     is_billable: Boolean(data?.is_billable),
