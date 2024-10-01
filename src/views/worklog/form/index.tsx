@@ -33,7 +33,7 @@ function AbstractForm(props: AbstractFormProps) {
   const [errMessage, setErrMessage] = useState("")
   const baseURL = `/worklog`
 
-  const { data: projects } = useProject()
+  const { data: projects } = useProject({ is_member: true })
 
   const formik = useFormik<z.infer<typeof worklogSchema>>({
     initialValues,

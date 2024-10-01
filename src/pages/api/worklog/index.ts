@@ -26,11 +26,28 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   // find all user project
   if (req.method === "GET") {
+    const { is_ownerships } = req.query
+    const skip = _.get(req.query, "skip", "0")
+    const take = _.get(req.query, "take", "10")
+
+    let conditions: any = {}
+
+    console.log(req.query)
+
+    if (is_ownerships) {
+      conditions = {
+        ...conditions,
+        user_id: newAuthorId,
+      }
+    }
+
     const result = await prisma.worklog.findMany({
-      take: 10,
+      skip: Number(skip),
+      take: Number(take),
+      where: conditions,
       include: { user: true, project: true },
     })
-    const total = await prisma.worklog.count()
+    const total = await prisma.worklog.count({ where: conditions })
 
     res.json({ data: result, total })
   }

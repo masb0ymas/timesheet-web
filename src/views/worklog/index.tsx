@@ -6,7 +6,7 @@ import useWorklog from "~/data/query/worklog/useWorklog"
 import { worklogColumn } from "./partials/columnDef"
 
 export default function WorklogPage() {
-  const query = useWorklog()
+  const query = useWorklog({ skip: 0, take: 10, is_ownerships: true })
   const baseURL = "/worklog"
 
   const mutation = useMutation({
