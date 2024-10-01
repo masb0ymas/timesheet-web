@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import React from "react"
-import Loader from "~/components/svg/loader"
+import SVGLoader from "~/components/svg/loader"
 
 interface IProps {
   fullWidth?: boolean
@@ -37,7 +37,7 @@ export function Button(props: ButtonProps) {
       )}
       {...props}
     >
-      {props.loading && <Loader />}
+      {props.loading && <SVGLoader />}
       {props.children}
     </button>
   )

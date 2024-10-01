@@ -1,7 +1,3 @@
-import React from 'react'
+import TeamPage from "~/views/team"
 
-export default function TeamPage() {
-  return (
-    <div>TeamPage</div>
-  )
-}
+export default TeamPage

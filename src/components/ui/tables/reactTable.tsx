@@ -12,7 +12,7 @@ import {
 import _ from "lodash"
 import { useRouter } from "next/router"
 import { useMemo, useState } from "react"
-import Loader from "~/components/svg/loader"
+import SVGLoader from "~/components/svg/loader"
 import { Button } from "../button"
 
 type Query = QueryObserverBaseResult & {
@@ -80,7 +80,7 @@ export default function Table<T>(props: IProps<T>) {
                 onClick={() => handleDelete(id)}
                 disabled={visible}
               >
-                {visible ? <Loader styleProps="-ml-1 -mr-1" /> : <IconTrash />}
+                {visible ? <SVGLoader styleProps="-ml-1 -mr-1" /> : <IconTrash />}
               </Button>
             )}
           </div>
@@ -147,8 +147,16 @@ export default function Table<T>(props: IProps<T>) {
         <tbody>
           {(isLoading || isFetching) && (
             <tr>
-              <td colSpan={columns.length + 1} className="flex justify-center items-center">
+              <td colSpan={columns.length + 2} className="flex justify-center items-center">
                 Loading...
+              </td>
+            </tr>
+          )}
+
+          {_.isEmpty(data) && (
+            <tr>
+              <td colSpan={columns.length + 2} className="flex justify-center items-center">
+                No Record.
               </td>
             </tr>
           )}
